@@ -49,7 +49,7 @@ ESCAPE_DOMAIN_NAME=$(echo "$DOMAIN_NAME" | sed 's#http[s]*://##g; s#\.#-#g;')
 
 
 # Create a local temporary file for the sitemap.
-sitemapTempfile=`tempfile 2>/dev/null` || sitemapTempfile=/tmp/$ESCAPE_DOMAIN_NAME-sitemap-$$
+sitemapTempfile=`mktemp "${TMPDIR:-/tmp}"/$ESCAPE_DOMAIN_NAME-sitemap-XXXXXXXX`
 trap "rm -f $sitemapTempfile" 0 1 2 5 15
 
 
