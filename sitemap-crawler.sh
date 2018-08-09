@@ -3,8 +3,8 @@
 #######################################################
 
 # What is it?
-#     This bash script will look for URL from your
-#     domain that are stored in the sitemap.xml file
+#     This bash script will look for URL that are
+#     stored in the specified sitemap.xml file
 
 # How to use?
 #     Open your console and launch: 
@@ -21,7 +21,7 @@
 
 # Global
 DOMAIN_NAME=$1
-declare -i nb=1
+declare -i nb=0
 
 # Colors
 MAGENTA="\033[0;35m"
@@ -32,7 +32,7 @@ NC="\033[0m"
 
 
 
-# Check if DOMAIN_NAME is not empty.
+# Check if DOMAIN_NAME is empty.
 # If not, continue.
 if [ "$1" = "" ]; then
     printf "${RED}You need to pass an URL to fetch!${NC}\n"
@@ -54,16 +54,13 @@ trap "rm -f $sitemapTempfile" 0 1 2 5 15
 
 
 
-# Call sitemap.xml and save it in the temporary file.
-curl -s -S $DOMAIN_NAME/sitemap.xml >> $sitemapTempfile
+# Call sitemap.xml and save it in the temporary file with a perfect indented XML format.
+curl -s -S $DOMAIN_NAME/sitemap.xml | xmllint --format - >> $sitemapTempfile
 
-# Display the homepage
-printf "$nb - ${MAGENTA}Visit${NC} $DOMAIN_NAME\n"
-
-# Search for URL that match the DOMAIN_NAME in the sitemap.
-grep -E -o "$DOMAIN_NAME[^<]+" $sitemapTempfile | while read -r line ; do
+# Search and show URL who are between the `loc` tag in the sitemap.
+grep -E -o "<loc>(.*)</loc>" $sitemapTempfile | while read -r line ; do
     nb=$nb+1
-    printf "$nb - ${MAGENTA}Visit${NC} $line\n"
+    printf "$nb - ${MAGENTA}Visit${NC} $(echo "$line" | sed 's#<[^>]*>##g') \n"
 done
 
 
