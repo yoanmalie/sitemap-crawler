@@ -58,7 +58,7 @@ curl -s -S $PATH_SITEMAP | xmllint --format - >> $sitemapTempfile
 grep -E -o "<loc>(.*)</loc>" $sitemapTempfile | ( while read -r line ;
     do
         nb=$nb+1
-        printf "${MAGENTA}Visit${NC} $(echo "$line" | sed 's#<[^>]*>##g') \n"
+        printf "${MAGENTA}Found${NC} $(echo "$line" | sed 's#<[^>]*>##g') \n"
     done
     printf "${GREEN}$PATH_SITEMAP fetched!${NC}\n"
     printf "${BLUE}$nb URL found.${NC}\n"
