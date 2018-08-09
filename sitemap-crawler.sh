@@ -8,7 +8,9 @@
 
 # How to use?
 #     Open your console and launch: 
-#     ./sitemap-crawler.sh https://yoursite.com
+#     ./sitemap-crawler.sh https://yoursite.com/sitemap.xml
+#     It's work also for local file:
+#     ./sitemap-crawler.sh ./path/to/your/sitemap.xml
 
 # About:
 #     github.com/yoanmalie/sitemap-crawler
@@ -20,7 +22,7 @@
 
 
 # Global
-DOMAIN_NAME=$1
+PATH_SITEMAP=$1
 declare -i nb=0
 
 # Colors
@@ -32,30 +34,25 @@ NC="\033[0m"
 
 
 
-# Check if DOMAIN_NAME is empty.
+# Check if PATH_SITEMAP is empty.
 # If not, continue.
 if [ "$1" = "" ]; then
-    printf "${RED}You need to pass an URL to fetch!${NC}\n"
+    printf "${RED}You need to pass the path of your sitemap.xml to fetch!${NC}\n"
     exit 1;
 else
-    printf "${BLUE}Start fetching data from $DOMAIN_NAME/sitemap.xml${NC}\n"
+    printf "${BLUE}Start fetching data from $PATH_SITEMAP${NC}\n"
 fi
 
 
 
-# Filtered domain name.
-ESCAPE_DOMAIN_NAME=$(echo "$DOMAIN_NAME" | sed 's#http[s]*://##g; s#\.#-#g;')
-
-
-
 # Create a local temporary file for the sitemap.
-sitemapTempfile=`mktemp "${TMPDIR:-/tmp}"/$ESCAPE_DOMAIN_NAME-sitemap-XXXXXXXX`
+sitemapTempfile=`mktemp "${TMPDIR:-/tmp}"/sitemap-XXXXXXXX`
 trap "rm -f $sitemapTempfile" 0 1 2 5 15
 
 
 
 # Call sitemap.xml and save it in the temporary file with a perfect indented XML format.
-curl -s -S $DOMAIN_NAME/sitemap.xml | xmllint --format - >> $sitemapTempfile
+curl -s -S $PATH_SITEMAP | xmllint --format - >> $sitemapTempfile
 
 # Search and show URL who are between the `loc` tag in the sitemap.
 grep -E -o "<loc>(.*)</loc>" $sitemapTempfile | while read -r line ; do
@@ -65,5 +62,5 @@ done
 
 
 
-printf "${GREEN}$DOMAIN_NAME/sitemap.xml fetched!${NC}\n"
+printf "${GREEN}$PATH_SITEMAP fetched!${NC}\n"
 
