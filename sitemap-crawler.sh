@@ -55,12 +55,11 @@ trap "rm -f $sitemapTempfile" 0 1 2 5 15
 curl -s -S $PATH_SITEMAP | xmllint --format - >> $sitemapTempfile
 
 # Search and show URL who are between the `loc` tag in the sitemap.
-grep -E -o "<loc>(.*)</loc>" $sitemapTempfile | while read -r line ; do
-    nb=$nb+1
-    printf "$nb - ${MAGENTA}Visit${NC} $(echo "$line" | sed 's#<[^>]*>##g') \n"
-done
-
-
-
-printf "${GREEN}$PATH_SITEMAP fetched!${NC}\n"
-
+grep -E -o "<loc>(.*)</loc>" $sitemapTempfile | ( while read -r line ;
+    do
+        nb=$nb+1
+        printf "${MAGENTA}Visit${NC} $(echo "$line" | sed 's#<[^>]*>##g') \n"
+    done
+    printf "${GREEN}$PATH_SITEMAP fetched!${NC}\n"
+    printf "${BLUE}$nb URL found.${NC}\n"
+)
